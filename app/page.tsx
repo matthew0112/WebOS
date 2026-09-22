@@ -6,16 +6,22 @@ import { Resizable, ResizeCallbackData } from 'react-resizable';
 
 import { Box, Card, CardContent, IconButton, Paper, Stack, ThemeProvider, Typography } from "@mui/material";
 import CalculateIcon from '@mui/icons-material/Calculate';
+import MapIcon from '@mui/icons-material/Map';
 import theme from "./theme";
 import 'react-resizable/css/styles.css';
 import { CheckBoxOutlineBlank, Close, Remove } from "@mui/icons-material";
 
 import { v4 as uuidv4 } from 'uuid';
+import dynamic from "next/dynamic";
+import Calculator from "./apps/calculator";
+
+const OSMMap = dynamic(() => import("./apps/maps"), { ssr: false });
 
 type APPS = { title: string, icon: ReactNode, content: ReactNode }[]
 
 const AVAILABLE_APPS: APPS = [
-  {title: "Calculator", icon: <CalculateIcon />, content: <Typography>1 + 1 = 2</Typography>}
+  {title: "Calculator", icon: <CalculateIcon />, content: <Calculator />},
+  {title: "Maps", icon: <MapIcon />, content: <OSMMap />}
 ]
 
 export default function Home() {
@@ -84,7 +90,7 @@ export default function Home() {
 
 function App({ title, icon, content, onClose }: { title: string, icon: ReactNode, content: ReactNode, onClose: () => void}) {
   const nodeRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 300, height: 200 });
+  const [dimensions, setDimensions] = useState({ width: 300, height: 300 });
 
   const onResize = (e: SyntheticEvent<Element, Event>, { size }: ResizeCallbackData) => {
     setDimensions({ width: size.width, height: size.height });
@@ -93,7 +99,7 @@ function App({ title, icon, content, onClose }: { title: string, icon: ReactNode
   return (
     <Draggable nodeRef={nodeRef} handle=".drag-handle">
       <Box ref={nodeRef} sx={{ position: 'relative', display: 'inline-block', width: dimensions.width, height: dimensions.height }}>
-        <Resizable width={dimensions.width} height={dimensions.height} onResize={onResize} minConstraints={[200, 150]}>
+        <Resizable width={dimensions.width} height={dimensions.height} onResize={onResize} minConstraints={[250, 250]}>
           <Card
             sx={{
               width: '100%',

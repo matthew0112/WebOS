@@ -154,12 +154,6 @@ const theme = createTheme({
       default: '#000000',
       paper: '#0a0a0a',
     },
-    primary: {
-      main: '#eece1a',
-    },
-    secondary: {
-      main: '#0a167e',
-    },
     text: {
       primary: '#E6EDF3',
       secondary: '#8B949E',

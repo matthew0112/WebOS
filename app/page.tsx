@@ -3,32 +3,45 @@
 import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
 import { Resizable, ResizeCallbackData } from 'react-resizable';
+import dynamic from "next/dynamic";
 
-import { Box, Card, CardContent, IconButton, Paper, Stack, ThemeProvider, Typography } from "@mui/material";
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import { ThemeProvider } from "@mui/material/styles";
+import Typography from '@mui/material/Typography';
+
 import CalculateIcon from '@mui/icons-material/Calculate';
 import MapIcon from '@mui/icons-material/Map';
-import theme from "./theme";
 import 'react-resizable/css/styles.css';
-import { CheckBoxOutlineBlank, Close, Remove } from "@mui/icons-material";
+import Remove from "@mui/icons-material/Remove";
+import WifiOffIcon from '@mui/icons-material/WifiOff';
+import WifiIcon from '@mui/icons-material/Wifi';
+import CheckBoxOutlineBlank from '@mui/icons-material/CheckBoxOutlineBlank';
+import Close from '@mui/icons-material/Close';
 
 import { v4 as uuidv4 } from 'uuid';
-import dynamic from "next/dynamic";
 import Calculator from "./apps/calculator";
-
+import theme from "./theme";
 const OSMMap = dynamic(() => import("./apps/maps"), { ssr: false });
 
 type APPS = { title: string, icon: ReactNode, content: ReactNode }[]
 
 const AVAILABLE_APPS: APPS = [
-  {title: "Calculator", icon: <CalculateIcon />, content: <Calculator />},
-  {title: "Maps", icon: <MapIcon />, content: <OSMMap />}
+  { title: "Calculator", icon: <CalculateIcon />, content: <Calculator /> },
+  { title: "Maps", icon: <MapIcon />, content: <OSMMap /> }
 ]
 
 export default function Home() {
   const [timeString, setTimeString] = useState("");
   const [dateString, setDateString] = useState("");
 
-  const [openApps, setOpenApps] = useState<{ id: string, title: string, icon: ReactNode, content: ReactNode }[]>([])
+  const [openApps, setOpenApps] = useState<{ id: string, title: string, icon: ReactNode, content: ReactNode }[]>([]);
+
+  const isOffline = useOffline();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -56,7 +69,7 @@ export default function Home() {
       >
         {/* OPEN APPS */}
         {openApps.map((value) => (
-          <App key={value.id} title={value.title} icon={value.icon} content={value.content} onClose={() => setOpenApps(openApps.filter(item => item.id !== value.id ))} />
+          <App key={value.id} title={value.title} icon={value.icon} content={value.content} onClose={() => setOpenApps(openApps.filter(item => item.id !== value.id))} />
         ))}
 
         {/* NAVIGATION BAR */}
@@ -75,12 +88,19 @@ export default function Home() {
         >
           <Stack direction="row">
             {AVAILABLE_APPS.map((app) => (
-              <IconButton key={app.title} onClick={() => setOpenApps(items => [...items, {...app, id: uuidv4()}])}>{app.icon}</IconButton>
+              <IconButton key={app.title} onClick={() => setOpenApps(items => [...items, { ...app, id: uuidv4() }])}>{app.icon}</IconButton>
             ))}
           </Stack>
-          <Stack sx={{ alignItems: "center" }}>
-            <Typography>{timeString}</Typography>
-            <Typography>{dateString}</Typography>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            {isOffline ? (
+              <WifiOffIcon />
+            ) : (
+              <WifiIcon />
+            )}
+            <Stack sx={{ alignItems: "center" }}>
+              <Typography>{timeString}</Typography>
+              <Typography>{dateString}</Typography>
+            </Stack>
           </Stack>
         </Paper>
       </Box>
@@ -88,7 +108,7 @@ export default function Home() {
   );
 }
 
-function App({ title, icon, content, onClose }: { title: string, icon: ReactNode, content: ReactNode, onClose: () => void}) {
+function App({ title, icon, content, onClose }: { title: string, icon: ReactNode, content: ReactNode, onClose: () => void }) {
   const nodeRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 300, height: 300 });
 
@@ -139,4 +159,26 @@ function App({ title, icon, content, onClose }: { title: string, icon: ReactNode
       </Box>
     </Draggable>
   )
+}
+
+export function useOffline() {
+  // navigator.onLine returns true if online, false if offline
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    // Listen for network connectivity changes
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Clean up event listeners on component unmount
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  return isOffline;
 }

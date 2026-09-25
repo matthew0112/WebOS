@@ -2,7 +2,7 @@ import 'leaflet/dist/leaflet.css';
 import React from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
 
 export default function OSMMap() {
   const position: [number, number] = [33.4484, -112.0740];

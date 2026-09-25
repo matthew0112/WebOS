@@ -1,7 +1,13 @@
 import { useState } from 'react';
 
-import { Box, Button, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
-
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 type operation = "+" | "-" | "*" | "/" | "^"
 export default function Calculator() {
@@ -95,7 +101,6 @@ export default function Calculator() {
           </TableRow>
           <TableRow>
             <TableCell colSpan={2}><Button variant="contained" fullWidth onClick={() => handleTypeNumber(0)}>0</Button></TableCell>
-            {/*<TableCell><Button variant="contained" fullWidth>.</Button></TableCell>*/}
           </TableRow>
         </TableBody>
       </Table>
